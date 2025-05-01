@@ -1,17 +1,30 @@
 package com.example.restaurantfinder.data.model
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.Embedded
+import androidx.room.TypeConverters
+import com.example.restaurantfinder.util.converters.AvailabilityConverters
+import com.example.restaurantfinder.util.converters.CuisineConverters
+import com.example.restaurantfinder.util.converters.DeliveryEtaConverters
+import com.example.restaurantfinder.util.converters.LocationListConverters
 
+@Entity(tableName = "restaurants")
 data class Restaurant(
-    val id: String,
+    @PrimaryKey val id: String,
     val name: String,
     val uniqueName: String,
+    @TypeConverters(CuisineConverters::class)
+//    @TypeConverters(RestaurantTypeConverters::class)
     val cuisines: List<Cuisine> = emptyList(), // Default to empty list if not provided
-    val rating: Rating? = null, // Nullable Rating
-    val address: Address? = null, // Nullable Address
+    @Embedded(prefix = "rating_") val rating: Rating? = null, // Nullable Rating
+//    @TypeConverters(RestaurantTypeConverters::class)
+    @Embedded val address: Address? = null, // Nullable Address
 
     val isNew: Boolean?,
     val driveDistanceMeters: Int?,
     val openingTimeLocal: String?,
     val deliveryOpeningTimeLocal: String?,
+    @TypeConverters(DeliveryEtaConverters::class)
     val deliveryEtaMinutes: DeliveryEta?,
     val isCollection: Boolean?,
     val isDelivery: Boolean?,
@@ -21,6 +34,7 @@ data class Restaurant(
     val deliveryCost: Double?,
     val minimumDeliveryValue: Double?,
     val logoUrl: String?,
+    @TypeConverters(AvailabilityConverters::class)
     val availability: Availability?,
 )
 
@@ -60,6 +74,8 @@ data class Address(
     val city: String,
     val firstLine: String,
     val postalCode: String,
+    @TypeConverters(LocationListConverters::class)
+    @Embedded(prefix = "location_")
     val location: Location
 )
 

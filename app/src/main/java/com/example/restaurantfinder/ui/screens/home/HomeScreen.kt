@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.restaurantfinder.ui.theme.MyFirstApplicationTheme
 import kotlinx.coroutines.launch
 import com.example.restaurantfinder.ui.screens.home.HomeViewModel
@@ -54,7 +55,8 @@ import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
+
+fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {//fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
     var postcode by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
@@ -62,6 +64,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
     val coroutineScope = rememberCoroutineScope()
 
     val state by viewModel.uiState.collectAsState()
+    val autoUpdatedRestaurants by viewModel.updatedRestaurants.collectAsState()
 
     fun showSnackbar(message: String) {
         coroutineScope.launch {

@@ -15,9 +15,11 @@ import com.example.restaurantfinder.ui.theme.MyFirstApplicationTheme
 
 import com.example.restaurantfinder.ui.screens.home.HomeScreen
 import com.example.restaurantfinder.ui.screens.home.HomeViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-//    private val homeViewModel: HomeViewModel by viewModels() // Get the ViewModel instance
+    private val homeViewModel: HomeViewModel by viewModels() // get the ViewModel instance - now works w Hilt
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,7 +31,7 @@ class MainActivity : ComponentActivity() {
 //                        modifier = Modifier.padding(innerPadding)
 //                    )
 //                }
-                HomeScreen()
+                HomeScreen(viewModel = homeViewModel)//HomeScreen()
 
 //                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 //                    HomeScreen(viewModel = homeViewModel)

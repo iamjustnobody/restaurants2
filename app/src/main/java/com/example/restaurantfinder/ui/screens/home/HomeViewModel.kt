@@ -2,6 +2,8 @@ package com.example.restaurantfinder.ui.screens.home
 
 
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.restaurantfinder.data.model.FilterOptions
@@ -9,14 +11,23 @@ import kotlinx.coroutines.launch
 import com.example.restaurantfinder.data.repository.RestaurantRepository
 import com.example.restaurantfinder.data.model.Restaurant
 import com.example.restaurantfinder.data.network.JustEatApi
+import com.example.restaurantfinder.data.repository.ApiResult
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
+@HiltViewModel
 //class HomeViewModel(private val restaurantRepository: RestaurantRepository) : ViewModel() {
-class HomeViewModel : ViewModel() {
-
+//class HomeViewModel : ViewModel() {
+//class HomeViewModel (application: Application) : AndroidViewModel(application) {
+class HomeViewModel @Inject constructor(
+    private val repository: RestaurantRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
@@ -29,8 +40,13 @@ class HomeViewModel : ViewModel() {
 //    private val _filteredRestaurants = MutableStateFlow<List<Restaurant>>(emptyList())
 //    val filteredRestaurants: StateFlow<List<Restaurant>> = _filteredRestaurants
 
-    private val repository = RestaurantRepository(JustEatApi.service)
-    fun searchRestaurants(postcode: String, initial: Boolean = true) {
+    val updatedRestaurants: StateFlow<List<Restaurant>> =
+        repository.getUpdatedRestaurants()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+//    private val repository = RestaurantRepository(application)//RestaurantRepository(JustEatApi.service)
+    fun searchRestaurants(postcode: String, initial: Boolean = true, limit: Int = 10, offset: Int = 0) {
+//        init
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
@@ -42,35 +58,71 @@ class HomeViewModel : ViewModel() {
                 )
             }
 
-            try {
-                val restaurants = repository.getRestaurantsByPostcode(postcode)
+//            try {
+//                val restaurants = repository.getRestaurantsByPostcode(postcode)
+//
+//                _uiState.update {
+//                    it.copy(
+//                        restaurants = if (initial) restaurants else it.restaurants + restaurants,
+//                        filteredRestaurants = restaurants, // or apply filters if needed
+//                        snackbarMessage = when {
+//                            initial && restaurants.isEmpty() -> "No restaurants found."
+//                            !initial && restaurants.isEmpty() -> "No more restaurants found."
+//                            else -> "Restaurants loaded successfully 🎉"
+//                        },
+//                        isLoading = false,
+//                        isLoadingMore = false,
+//                        showSuccessDialog = initial,
+//                        noMoreItems = restaurants.isEmpty()
+//                    )
+//                }
+//
+//            } catch (e: Exception) {
+//                _uiState.update {
+//                    it.copy(
+//                        isLoading = false,
+//                        isLoadingMore = false,
+//                        errorMessage = e.localizedMessage ?: "Unknown error",
+//                        snackbarMessage = "Error: ${e.localizedMessage ?: "Unknown error"}"
+//                    )
+//                }
+//            }
 
-                _uiState.update {
-                    it.copy(
-                        restaurants = if (initial) restaurants else it.restaurants + restaurants,
-                        filteredRestaurants = restaurants, // or apply filters if needed
-                        snackbarMessage = when {
-                            initial && restaurants.isEmpty() -> "No restaurants found."
-                            !initial && restaurants.isEmpty() -> "No more restaurants found."
-                            else -> "Restaurants loaded successfully 🎉"
-                        },
-                        isLoading = false,
-                        isLoadingMore = false,
-                        showSuccessDialog = initial,
-                        noMoreItems = restaurants.isEmpty()
-                    )
+            when (val result = repository.getRestaurantsByPostcode(postcode)) {
+                is ApiResult.Success -> {
+                    val cached: List<Restaurant> = repository.getCachedRestaurants(limit, offset)
+                    val restaurantList: List<Restaurant> = result.data
+                    _uiState.update {
+                        it.copy(
+                            restaurants = if (initial) restaurantList else it.restaurants + restaurantList,
+                            filteredRestaurants = restaurantList, // or apply filters if needed
+                            snackbarMessage = when {
+                                initial && restaurantList.isEmpty() -> "No restaurants found."
+                                !initial && restaurantList.isEmpty() -> "No more restaurants found."
+                                else -> "Restaurants loaded successfully 🎉"
+                            },
+                            isLoading = false,
+                            isLoadingMore = false,
+                            showSuccessDialog = initial,
+                            noMoreItems = restaurantList.isEmpty()
+                        )
+                    }
                 }
 
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        isLoadingMore = false,
-                        errorMessage = e.localizedMessage ?: "Unknown error",
-                        snackbarMessage = "Error: ${e.localizedMessage ?: "Unknown error"}"
-                    )
+                is ApiResult.Error -> {
+                    val errorMessage = result.message
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isLoadingMore = false,
+                            errorMessage = errorMessage,
+                            snackbarMessage = "Error: ${result.throwable?.localizedMessage ?: "Unknown error"}"
+
+                        )
+                    }
                 }
             }
+
         }
     }
 
