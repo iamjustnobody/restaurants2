@@ -273,11 +273,11 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) { //viewModel: HomeVi
                     Text("Search")
                 }
 
-//                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(12.dp))
-                SortAndFilterControls(currentSorting = state.sortingOption, onSortSelect = { viewModel.sortFilteredRestaurants(it) }, onFilterClick = { viewModel.updateFilterDialogVisible(true)})
-                Spacer(modifier = Modifier.height(8.dp))
+//                Spacer(modifier = Modifier.height(12.dp))
+//                SortAndFilterControls(currentSorting = state.sortingOption, onSortSelect = { viewModel.sortFilteredRestaurants(it) }, onFilterClick = { viewModel.updateFilterDialogVisible(true)})
+//                Spacer(modifier = Modifier.height(8.dp))
 
                 // Loading Indicator
                 if (state.isLoading) {

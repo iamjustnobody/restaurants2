@@ -52,6 +52,13 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    testOptions {
+        unitTests.all {
+            it.useJUnitPlatform() // Configure JUnit platform for unit tests
+        }
+    }
+
 }
 
 dependencies {
@@ -75,25 +82,41 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
 //    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-moshi:2.9.0")
-    implementation ("com.squareup.moshi:moshi:1.13.0")
-    implementation ("com.squareup.moshi:moshi-kotlin:1.13.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    implementation("com.squareup.moshi:moshi:1.13.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.13.0")
 
-    implementation ("androidx.compose.ui:ui:1.4.0")
-    implementation ("androidx.compose.material3:material3:1.1.0")
+    implementation("androidx.compose.ui:ui:1.4.0")
+    implementation("androidx.compose.material3:material3:1.1.0")
 //    implementation ("androidx.compose.foundation:foundation:1.4.0")
 //    implementation ("androidx.compose.foundation:foundation-layout:1.4.0")
     implementation("androidx.compose.material:material:1.4.0") // For Material icons
 //    implementation("androidx.compose.ui:ui-tooling-preview:1.4.0")
-    implementation ("com.google.accompanist:accompanist-placeholder-material:0.24.13-rc")
+    implementation("com.google.accompanist:accompanist-placeholder-material:0.24.13-rc")
 
-    implementation ("io.coil-kt:coil-compose:2.1.0")
+    implementation("io.coil-kt:coil-compose:2.1.0")
 
-    implementation ("com.google.dagger:hilt-android:2.48")
+    implementation("com.google.dagger:hilt-android:2.48")
 //    kapt ("com.google.dagger:hilt-compiler:2.48")
-    kapt ("com.google.dagger:hilt-android-compiler:2.48")
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
+
+    // Unit testing dependencies
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:4.0.0")
+    testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.5.21") // Kotlin test libraries
+
+    // Compose UI testing dependencies
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.5")
+    androidTestImplementation("androidx.compose.ui:ui-test:1.0.5")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3") // JUnit support for Android
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0") // Espresso core for UI testing
+    androidTestImplementation("androidx.compose.ui:ui-tooling:1.0.5")  // For UI previsualization and tooling
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
 
 
 }
